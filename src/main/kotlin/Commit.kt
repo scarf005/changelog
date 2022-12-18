@@ -1,15 +1,7 @@
 import java.io.File
 
-val types = listOf("build", "ci", "docs", "feat", "fix", "perf", "refactor", "style", "test")
-
 /** stores conventional commit */
 data class Commit(val sha: String, val type: String, val title: String)
-
-fun version(type: String) = when {
-    "!" in type -> Version.MAJOR
-    type == "feat" -> Version.MINOR
-    else -> Version.PATCH
-}
 
 /**
  * @param begin inclusive
@@ -24,3 +16,6 @@ fun commitsBetween(begin: String, end: String = "HEAD", cwd: File = File(".")) =
             val (type, title) = message.split(':', limit = 2)
             Commit(sha, type, title.trim())
         }
+
+fun latestTag(cwd: File = File(".")): String =
+    "git describe --abbrev=0 --tags".runCommand(cwd).trim()

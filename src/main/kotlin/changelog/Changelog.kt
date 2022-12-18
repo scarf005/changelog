@@ -24,6 +24,11 @@ class Changelog(
     val version = "${commits.toSemVer()}"
     val tag = "v$version"
     val date = commits.first().date()
+    
+    fun sections(section: (ChangeLogType, List<Commit>) -> String) = commits
+        .groupByTo(sortedMapOf()) { it.changeLogType() }
+        .map { (type, commits) -> section(type, commits) }
+        .joinToString("\n\n")
 
     private fun Commit.isIncluded() = breaking || type in listOf("feat", "fix")
     private fun Commit.date(): String =

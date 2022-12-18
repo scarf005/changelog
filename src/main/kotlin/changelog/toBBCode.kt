@@ -2,18 +2,19 @@ package changelog
 
 import Commit
 
-fun Changelog.toMarkdown() =
+fun Changelog.toBBCode() =
     """
-        |# $tag ($date)
+        |[h1]$tag ($date)[/h1]
         |
         |${sections(::section)}
         |
     """.trimMargin()
 
-
 private fun section(type: ChangeLogType, commits: List<Commit>): String =
     """
-       |## ${type.desc}
-       |
-       |${commits.joinToString("\n") { "- ${it.title}" }}
+        |[h2]${type.desc}[/h2]
+        |
+        |[list]
+        |${commits.joinToString("\n") { "    [*] ${it.title}" }}
+        |[/list]
     """.trimMargin()

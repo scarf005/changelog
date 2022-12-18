@@ -1,21 +1,16 @@
-import java.io.File
-
-/** stores conventional commit */
-data class Commit(val sha: String, val type: String, val title: String)
-
 /**
- * @param begin inclusive
- * @param end inclusive
+ * stores conventional commit. scope is not yet supported.
+ *
+ * @property sha simplified commit hash
+ * @property breaking true if commit contains breaking change
+ * @property type type of commit, e.g. feat, fix, refactor, etc.
+ * @property title title of commit, e.g. fix typo
  */
-fun commitsBetween(begin: String, end: String = "HEAD", cwd: File = File(".")) =
-    listOf("git", "log", "--pretty=format:'%h %s'", "$begin^..$end")
-        .runCommand(cwd).lines()
-        .filter { title -> types.any { title.substringAfter(' ').startsWith(it) } }
-        .map {
-            val (sha, message) = it.split(' ', limit = 2)
-            val (type, title) = message.split(':', limit = 2)
-            Commit(sha, type, title.trim())
-        }
-
-fun latestTag(cwd: File = File(".")): String =
-    "git describe --abbrev=0 --tags".runCommand(cwd).trim()
+data class Commit(
+    val sha: String,
+    val breaking: Boolean = false,
+    val type: String,
+    val title: String,
+) {
+    override fun toString() = "$sha $type: $title"
+}

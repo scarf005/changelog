@@ -9,4 +9,4 @@ fun List<String>.runCommand(workingDir: File = File(".")) =
         .inputStream.bufferedReader().readText()
 
 fun String.runCommand(workingDir: File = File(".")) =
-    split("\\s".toRegex()).runCommand(workingDir)
+    split("\\s+".toRegex()).runCommand(workingDir)

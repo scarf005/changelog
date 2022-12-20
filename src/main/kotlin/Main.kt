@@ -10,22 +10,30 @@ import kotlin.io.path.writeText
 val initial = "1d058628729d77644a151f6aa82b380479a1a941"
 
 
+val cwd = Path("/home/scarf/repo/Marisa")
+val changelogPath = cwd / "docs" / "changelog"
+val changelogFile = changelogPath / "changelog.md"
+val bbcodeFile = changelogPath / "changelog.bbcode"
+val versionFile = changelogPath / "version.txt"
+
 fun main() {
-    val cwd = Path("/home/scarf/repo/Marisa")
-    val changelog = Changelog(cwd.toFile(), begin = initial)
-    val changelogPath = cwd / "docs" / "changelog"
-    val changelogFile = changelogPath / "changelog.md"
-    val bbcodeFile = changelogPath / "changelog.bbcode"
-    val versionFile = changelogPath / "version.txt"
-
-    versionFile.writeText(changelog.version)
-    changelogFile.writeText(changelog.toMarkdown())
-    bbcodeFile.writeText(changelog.toBBCode())
-
     KGit.open(cwd.toFile()).run {
         val tags = tagList()
-        println(tags)
-        if (tags.isNotEmpty()) return
+        if (tags.isEmpty()) {
+            println("No tags found, please create a tag first")
+            return
+        }
+        val latestTag = tags.last()
+
+        val changelog = Changelog(
+            cwd.toFile(),
+            begin = latestTag.objectId.name,
+            baseVersion = SemVer.from(latestTag.name)
+        )
+
+        versionFile.writeText(changelog.version.toString())
+        changelogFile.writeText(changelog.toMarkdown())
+        bbcodeFile.writeText(changelog.toBBCode())
 
         tag {
             name = changelog.tag

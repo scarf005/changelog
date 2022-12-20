@@ -5,7 +5,8 @@ private fun range(begin: String, end: String, cwd: File) = when {
     begin.isEmpty() -> end
     begin.sha(cwd) == root(cwd) -> end
     else -> "$begin^..$end"
-}.also { println("begin:${begin.sha(cwd)}, root:${root(cwd)}, ${begin.sha(cwd) == root(cwd)}") }
+}
+//    .also { println("begin:${begin.sha(cwd)}, root:${root(cwd)}, ${begin.sha(cwd) == root(cwd)}") }
 
 fun commitsBetween(begin: String, end: String, cwd: File) =
     listOf("git", "log", "--pretty=format:%h %s", range(begin, end, cwd))
@@ -17,7 +18,11 @@ fun commitsBetween(begin: String, end: String, cwd: File) =
             Commit(sha, "!" in type, type.removeSuffix("!"), title.trim())
         }
 
-fun latestTag(cwd: File): String = "git describe --abbrev=0 --tags".parse(cwd)
+fun latestTag(cwd: File): String = try {
+    "git describe --abbrev=0 --tags".parse(cwd)
+} catch (e: Exception) {
+    ""
+}
 
 fun root(cwd: File): String = "git rev-list --all --max-parents=0".parse(cwd)
 

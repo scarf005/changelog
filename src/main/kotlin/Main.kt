@@ -1,18 +1,36 @@
+import changelog.Changelog
+import changelog.toMarkdown
+import com.github.syari.kgit.KGit
+import kotlin.io.path.Path
+import kotlin.io.path.div
+import kotlin.io.path.writeText
+
+
 val initial = "1d058628729d77644a151f6aa82b380479a1a941"
 
+
 fun main() {
-//    val cwd = File("/home/scarf/repo/Marisa")
-    val commits = Changelog()
+    val cwd = Path("/home/scarf/repo/Marisa")
+    val changelog = Changelog(cwd.toFile(), begin = initial)
+    val changelogFile = cwd / "changelog.md"
+    val versionFile = cwd / "version.txt"
 
-    println(commits)
+    versionFile.writeText(changelog.version)
+    changelogFile.writeText(changelog.toMarkdown())
+
+    changelog.toMarkdown().also(::println)
+
+    KGit.open(cwd.toFile()).run {
+        val tags = tagList()
+        println(tags)
+        if (tags.isNotEmpty()) return
+
+        tag {
+            name = changelog.tag
+            message = changelog.toMarkdown()
+        }
+    }
 }
 
-enum class ChangeLogType(val desc: String) {
-    BREAKING("Breaking Changes"), FEAT("New Features"), FIXES("Fixes"), OTHER("Other Changes")
-}
-
-fun Commit.changeLogType() = when (type) {
-    "feat" -> ChangeLogType.FEAT
-    "fix" -> ChangeLogType.FIXES
-    else -> ChangeLogType.OTHER
-}
+fun <T> List<T>.mapIf(condition: (T) -> Boolean, transform: (T) -> T): List<T> =
+    map { if (condition(it)) transform(it) else it }

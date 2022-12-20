@@ -4,7 +4,7 @@ import java.io.File
 private fun range(begin: String, end: String, cwd: File) = when {
     begin.isEmpty() -> end
     begin.sha(cwd) == root(cwd) -> end
-    else -> "$begin^..$end"
+    else -> "$begin..$end"
 }
 //    .also { println("begin:${begin.sha(cwd)}, root:${root(cwd)}, ${begin.sha(cwd) == root(cwd)}") }
 

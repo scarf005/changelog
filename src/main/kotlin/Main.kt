@@ -1,13 +1,10 @@
-import java.io.File
-
 val initial = "1d058628729d77644a151f6aa82b380479a1a941"
 
 fun main() {
-    val cwd = File("/home/scarf/repo/Marisa")
-    val begin = latestTag(cwd).ifEmpty { initial }
-    val commits = CommitRange(cwd, begin)
+//    val cwd = File("/home/scarf/repo/Marisa")
+    val commits = Changelog()
 
-    println(commits.changelog)
+    println(commits)
 }
 
 enum class ChangeLogType(val desc: String) {

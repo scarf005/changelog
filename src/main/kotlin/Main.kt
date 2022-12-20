@@ -25,9 +25,10 @@ fun main() {
         }
         val latestTag = tags.last()
 
+        val hash = repository.refDatabase.peel(latestTag).peeledObjectId.name
         val changelog = Changelog(
             cwd.toFile(),
-            begin = latestTag.objectId.name,
+            begin = hash,
             baseVersion = SemVer.from(latestTag.name)
         )
 

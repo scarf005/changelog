@@ -27,8 +27,11 @@ fun List<ConventionalCommit>.version(criteria: VersionCriteria) = asReversed()
         acc + version
     }
 
-val markdownTemplate =
-    Yaml.default.decodeFromString<Template>(Path("src/main/resources/markdown.yaml").readText())
+val templates =
+    listOf(
+        "markdown",
+        "bbcode"
+    ).associateWith { Yaml.default.decodeFromString<Template>(Path("src/main/resources/$it.yaml").readText()) }
 
 fun List<ConventionalCommit>.toSections(sections: ChangelogSections) =
     groupBy { it.parseType(sections) }
@@ -50,7 +53,7 @@ fun main() {
 
         val criteria = VersionCriteria()
 
-        Template.of(commits, defaultSections, criteria)(markdownTemplate).also(::println)
+        Template.builder(commits, defaultSections, criteria)(templates["bbcode"]!!).also(::println)
 
 
 //        tag {

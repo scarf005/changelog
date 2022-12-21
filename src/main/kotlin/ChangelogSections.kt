@@ -1,3 +1,5 @@
+data class ChangelogSectionType(val desc: String, val types: List<String>)
+
 class ChangelogSections(
     vararg val sections: ChangelogSectionType,
     breakingText: String = "Breaking Changes"

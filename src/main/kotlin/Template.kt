@@ -14,8 +14,19 @@ data class Template(
 ) {
     // TODO: assert only allowed {key}s are in template string
     init {
-        replace?.map { (k, v) -> println("$k -> $v") }
+        allKeys("tag", "date", "sections").shouldContain(changelog)
+        allKeys("desc", "items").shouldContain(section)
+        allKeys("desc").shouldContain(items)
     }
+
+    private fun Set<String>.shouldContain(text: String) = text.keys().let {
+        require(this.containsAll(it)) { "keys must be a subset of $this, but ${it - this} is not" }
+    }
+
+
+    private fun allKeys(vararg strings: String) = strings.toSet() + (keys?.keys ?: emptySet())
+    private fun String.keys() =
+        Regex("""\{(\w+)}""").findAll(this).map { it.groupValues[1] }.toSet()
 
     private fun String.applyKeys() = keys?.let { keys ->
         keys.entries.fold(this) { acc, (k, v) ->

@@ -1,8 +1,11 @@
+import com.charleskorn.kaml.Yaml
 import com.github.syari.kgit.KGit
+import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import org.eclipse.jgit.revwalk.RevCommit
 import kotlin.io.path.Path
 import kotlin.io.path.div
+import kotlin.io.path.readText
 
 private val logger = KotlinLogging.logger {}
 
@@ -24,19 +27,8 @@ fun List<ConventionalCommit>.version(criteria: VersionCriteria) = asReversed()
         acc + version
     }
 
-val markdownTemplate = Template(
-    """
-        |# {tag} ({date})
-        |
-        |{sections}
-    """.trimMargin(),
-    """
-        |## {desc}
-        |
-        |{items}
-    """.trimMargin(),
-    "- {desc}"
-)
+val markdownTemplate =
+    Yaml.default.decodeFromString<Template>(Path("src/main/resources/markdown.yaml").readText())
 
 fun List<ConventionalCommit>.toSections(sections: ChangelogSections) =
     groupBy { it.parseType(sections) }

@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
     application
 }
 
@@ -13,6 +14,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.charleskorn.kaml:kaml:0.49.0")
     implementation("com.github.sya-ri:kgit:1.0.5")
 
     implementation("org.slf4j:slf4j-api:2.0.6")

@@ -22,4 +22,4 @@ private fun String.replaceCode() =
     replace("`([^`]+)`".toRegex()) { "[i]${it.groupValues[1]}[/i]" }
 
 private fun String.replacePR(repoURL: String) =
-    replace("#(\\d+)".toRegex()) { "[url=https://github.com/${repoURL}/pull/${it.groupValues[1]}]${it.groupValues[0]}[/url]" }
+    replace("""#(\d+)""".toRegex()) { "[url=https://github.com/${repoURL}/pull/${it.groupValues[1]}]${it.groupValues[0]}[/url]" }

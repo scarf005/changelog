@@ -58,11 +58,7 @@ fun main() {
 
         val criteria = VersionCriteria()
 
-        markdownTemplate.toChangelog(
-            commits,
-            defaultSections,
-            criteria
-        ).also(::println)
+        Template.of(commits, defaultSections, criteria)(markdownTemplate).also(::println)
 
 
 //        tag {

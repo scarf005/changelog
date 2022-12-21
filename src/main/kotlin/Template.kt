@@ -39,4 +39,13 @@ data class Template(
                     .replace("{date}", date)
             }
     }
+
+    companion object {
+        fun of(
+            commits: List<ConventionalCommit>,
+            section: ChangelogSections,
+            criteria: VersionCriteria,
+        ): (Template) -> String =
+            { template: Template -> template.toChangelog(commits, section, criteria) }
+    }
 }

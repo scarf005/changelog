@@ -24,18 +24,26 @@ fun List<ConventionalCommit>.version(criteria: VersionCriteria) = asReversed()
         acc + version
     }
 
-val changelog = """
-      |# {tag} ({date})
-      |
-      |{sections}
-""".trimMargin()
-val section = """
-    |## {desc}
-    |
-    |{items}
-""".trimMargin()
-val items = "- {desc}"
+val markdownTemplate = Template(
+    """
+        |# {tag} ({date})
+        |
+        |{sections}
+    """.trimMargin(),
+    """
+        |## {desc}
+        |
+        |{items}
+    """.trimMargin(),
+    "- {desc}"
+)
 
+fun List<ConventionalCommit>.toSections(sections: ChangelogSections) =
+    groupBy { it.parseType(sections) }
+        .filterNotNull()
+        .toSortedMap(compareBy {
+            if (it === sections.breaking) -1 else sections.sections.indexOf(it)
+        })
 
 fun main() {
     val defaultSections = ChangelogSections(
@@ -49,32 +57,12 @@ fun main() {
             .mapNotNull { ConventionalCommit.of(it) }
 
         val criteria = VersionCriteria()
-        val version = commits.version(criteria)
 
-        val changelog =
-//            log { addRange(lastTag, HEAD()) }
-            log { addRange(findId("v0.0.0"), HEAD()) }
-                .mapNotNull { ConventionalCommit.of(it) }
-                .groupBy { it.parseType(defaultSections) }
-                .filterNotNull()
-                .toSortedMap(compareBy {
-                    if (it === defaultSections.breaking) -1 else defaultSections.sections.indexOf(it)
-                })
-                .map { (key, commits) ->
-                    val list = commits.joinToString("\n") { items.replace("{desc}", it.desc) }
-                    section
-                        .replace("{desc}", key.desc)
-                        .replace("{items}", list) + "\n"
-                }
-                .let {
-                    val date = repository.parseCommit(HEAD()).date()
-
-                    changelog
-                        .replace("{sections}", it.joinToString("\n"))
-                        .replace("{tag}", version.toString())
-                        .replace("{date}", date)
-                }
-                .also(::println)
+        markdownTemplate.toChangelog(
+            commits,
+            defaultSections,
+            criteria
+        ).also(::println)
 
 
 //        tag {

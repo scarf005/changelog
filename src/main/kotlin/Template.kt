@@ -12,15 +12,23 @@ data class Template(
     val replace: Map<String, String>? = null,
     val keys: Map<String, String>? = null,
 ) {
-    // TODO: assert only allowed {key}s are in template string
     init {
+        checkReservedKeys()
         allKeys("tag", "date", "sections").shouldContain(changelog)
         allKeys("desc", "items").shouldContain(section)
         allKeys("desc").shouldContain(items)
     }
 
-    private fun Set<String>.shouldContain(text: String) = text.keys().let {
-        require(this.containsAll(it)) { "keys must be a subset of $this, but ${it - this} is not" }
+    private fun checkReservedKeys() {
+        val reservedKeys = setOf("tag", "date", "desc", "sections")
+        val keys = (keys?.keys ?: emptySet()).toSet()
+        val diff = reservedKeys.intersect(keys)
+        require(diff.isEmpty()) { "The following keys are reserved $reservedKeys but got $diff" }
+    }
+
+    private fun Set<String>.shouldContain(text: String) {
+        val keys = text.keys()
+        require(this.containsAll(keys)) { "keys must be a subset of $this, but ${keys - this} is not" }
     }
 
 

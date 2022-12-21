@@ -1,0 +1,5 @@
+extends: src/main/resources/bbcode.yaml
+
+additionalKeys:
+  user: scarf005
+  repo: marisa

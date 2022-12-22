@@ -1,15 +1,12 @@
-package changelog
+package group
 
-import ChangelogSections
-import ConventionalCommit
 import date
-import toSections
 import version
 import version.VersionCriteria
 
-class ChangelogGroup(
+class CommitGroup(
     commits: List<ConventionalCommit>,
-    sectionCriteria: ChangelogSections = ChangelogSections(),
+    sectionCriteria: CommitSections = CommitSections(),
     versionCriteria: VersionCriteria = VersionCriteria(),
 ) {
     val date = commits.first().commit.date()

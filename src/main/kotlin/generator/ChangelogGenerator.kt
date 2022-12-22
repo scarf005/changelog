@@ -1,34 +1,35 @@
-package changelog
+package generator
 
-import ConventionalCommit
-import SectionType
 import config.Config
 import config.Template
+import group.CommitGroup
+import group.CommitSection
+import group.ConventionalCommit
 
 fun Map<String, String>.template(text: String) =
     entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }
 
 class ChangelogGenerator(
-    private val changelogGroup: ChangelogGroup
+    private val commitGroup: CommitGroup
 ) {
     private fun applyTemplate(
         template: Template,
     ): String {
         fun renderItem(message: String) = template.items.replace("{desc}", message)
 
-        fun renderSection(type: SectionType, list: List<ConventionalCommit>) =
+        fun renderSection(type: CommitSection, list: List<ConventionalCommit>) =
             mapOf(
                 "{desc}" to type.desc,
                 "{items}" to list.joinToString("\n") { renderItem(it.desc) }
             ).template(template.section)
 
-        return changelogGroup.logGroup
+        return commitGroup.logGroup
             .map { (type, list) -> renderSection(type, list) }
             .let {
                 mapOf(
                     "{sections}" to it.joinToString("\n").trimEnd(),
-                    "{tag}" to "v${changelogGroup.version}",
-                    "{date}" to changelogGroup.date,
+                    "{tag}" to commitGroup.version.tag,
+                    "{date}" to commitGroup.date,
                 ).template(template.changelog)
             }
     }

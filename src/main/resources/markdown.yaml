@@ -1,0 +1,11 @@
+changelog: |
+  # {tag} ({date})
+  
+  {sections}
+
+section: |
+  ## {desc}
+  
+  {items}
+
+items: "- {desc}"

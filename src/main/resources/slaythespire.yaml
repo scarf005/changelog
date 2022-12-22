@@ -1,0 +1,11 @@
+changelog: |
+  What's new in {tag} ({date})
+  
+  {sections}
+
+section: |
+  * {desc}
+  
+  {items}
+
+items: "- {desc}"

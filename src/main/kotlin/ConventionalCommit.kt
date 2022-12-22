@@ -6,7 +6,7 @@ class ConventionalCommit(val commit: RevCommit) {
     val type = groups["type"]!!.value
     val scope = groups["scope"]?.value
     val breaking = groups["breaking"] != null
-    val description = groups["description"]!!.value
+    val desc = groups["description"]!!.value
 
     override fun toString() = commit.shortMessage!!
     override fun equals(other: Any?) = other is ConventionalCommit && commit == other.commit

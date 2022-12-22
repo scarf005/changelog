@@ -17,24 +17,3 @@ data class SemVer(val major: Int = 0, val minor: Int = 0, val patch: Int = 0) {
             .let { SemVer(it[0], it[1], it[2]) }
     }
 }
-
-val types = listOf("build", "ci", "docs", "feat", "fix", "perf", "refactor", "style", "test")
-
-
-fun Commit.version() = when {
-    breaking -> Version.MAJOR
-    type == "feat" -> Version.MINOR
-    else -> Version.PATCH
-}
-
-fun createSemVer(commits: List<Commit>, baseVersion: SemVer): SemVer =
-    commits.fold(baseVersion) { acc, commit -> acc + commit.version() }
-
-fun List<Commit>.toSemVer(baseVersion: SemVer) = createSemVer(this, baseVersion)
-
-//fun RevCommit.version() = when {
-//    breaking -> Version.MAJOR
-//    type == "feat" -> Version.MINOR
-//    else -> Version.PATCH
-//}
-//fun List<RevCommit>.toSemver(base: SemVer) = fold(base) { acc, commit -> acc + commit.version() }}

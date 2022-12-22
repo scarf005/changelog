@@ -1,0 +1,16 @@
+changelog: |
+  [h1]{tag} ({date})[/h1]
+  
+  ${sections}
+
+section: |
+  [h2]{desc}[/h2]
+  [list]
+      {items}
+  [/list]
+
+items: "[*] {text}"
+
+replace:
+  "`([^`]+)`": "[i]$1[/i]"
+  "#(\d+)": "[url=https://github.com/{user}/{repo}/pull/$1]$0[/url]"

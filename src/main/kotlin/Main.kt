@@ -1,8 +1,11 @@
+import com.charleskorn.kaml.Yaml
 import com.github.syari.kgit.KGit
+import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import org.eclipse.jgit.revwalk.RevCommit
 import kotlin.io.path.Path
 import kotlin.io.path.div
+import kotlin.io.path.readText
 
 private val logger = KotlinLogging.logger {}
 
@@ -16,6 +19,24 @@ val conventionalTitle = Regex("""\w+(\(\w+\))?!?:\s.+""")
 fun RevCommit.isConventional() = conventionalTitle.matches(shortMessage)
 fun RevCommit.parent(): RevCommit = parents.singleOrNull() ?: this
 
+/** @receiver commits from latest to oldest */
+fun List<ConventionalCommit>.version(criteria: VersionCriteria) = asReversed()
+    .fold(SemVer()) { acc, commit ->
+        val version = commit.parseVersion(criteria)
+        if (version != null) logger.debug { "$acc + $version -> ${acc + version} :: $commit" }
+        acc + version
+    }
+
+val markdownTemplate =
+    Yaml.default.decodeFromString<Template>(Path("src/main/resources/markdown.yaml").readText())
+
+fun List<ConventionalCommit>.toSections(sections: ChangelogSections) =
+    groupBy { it.parseType(sections) }
+        .filterNotNull()
+        .toSortedMap(compareBy {
+            if (it === sections.breaking) -1 else sections.sections.indexOf(it)
+        })
+
 fun main() {
     val defaultSections = ChangelogSections(
         ChangelogSectionType("New Features", listOf("feat")),
@@ -28,31 +49,10 @@ fun main() {
             .mapNotNull { ConventionalCommit.of(it) }
 
         val criteria = VersionCriteria()
-        val version = commits.asReversed()
-            .fold(SemVer()) { acc, commit ->
-                val version = commit.parseVersion(criteria)
-                if (version != null) logger.debug { "$acc + $version -> ${acc + version} :: $commit" }
-                acc + version
-            }
-        val lastTag = peel(tagList().last())
-        val changelog =
-//            log { addRange(lastTag, HEAD()) }
-            log { addRange(findId("1cee4ce"), HEAD()) }
-                .mapNotNull { ConventionalCommit.of(it) }
-                .groupBy { it.parseType(defaultSections) }
-                .onEach { println(it) }
-//            .onEach { logger.info { it } }
 
-//        val changelog = Changelog(
-//            cwd.toFile(),
-//            begin = hash,
-//            baseVersion = SemVer.from(latestTag.name)
-//        )
-//
-//        versionFile.writeText(changelog.version.toString())
-//        changelogFile.writeText(changelog.toMarkdown())
-//        bbcodeFile.writeText(changelog.toBBCode())
-//
+        Template.of(commits, defaultSections, criteria)(markdownTemplate).also(::println)
+
+
 //        tag {
 //            name = changelog.tag
 //            message = changelog.toMarkdown()

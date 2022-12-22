@@ -1,4 +1,4 @@
-package changelog
+package config
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

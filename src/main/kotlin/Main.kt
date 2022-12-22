@@ -1,7 +1,7 @@
 import changelog.ChangelogGenerator
-import changelog.Config
 import com.charleskorn.kaml.Yaml
 import com.github.syari.kgit.KGit
+import config.Config
 import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import org.eclipse.jgit.revwalk.RevCommit

@@ -3,6 +3,8 @@ package changelog
 import ChangelogSections
 import ConventionalCommit
 import SectionType
+import config.Config
+import config.Template
 import date
 import toSections
 import version
@@ -11,24 +13,11 @@ import version.VersionCriteria
 fun Map<String, String>.template(text: String) =
     entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }
 
-fun Map<Regex, String>.templateRegex(text: String) =
-    entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }
-
 class ChangelogGenerator(
     private val commits: List<ConventionalCommit>,
     private val sectionCriteria: ChangelogSections = ChangelogSections(),
     private val versionCriteria: VersionCriteria = VersionCriteria(),
 ) {
-    private fun postprocess(postprocessor: PostProcess, text: String): String {
-        fun String.applyKeys() =
-            postprocessor.keys.mapKeys { "{${it.key}}" }.template(this)
-
-        fun String.applyRegex() =
-            postprocessor.replace.mapKeys { it.key.toRegex() }.templateRegex(this)
-
-        return text.applyRegex().applyKeys()
-    }
-
     private fun applyTemplate(
         template: Template,
         commits: List<ConventionalCommit>
@@ -56,6 +45,9 @@ class ChangelogGenerator(
             }
     }
 
-    fun render(config: Config): String =
-        postprocess(config.postProcess, applyTemplate(config.template, commits))
+    fun render(config: Config): String {
+        val postProcessor = PostProcessor(config.postProcess)
+        val text = applyTemplate(config.template, commits)
+        return postProcessor.process(text)
+    }
 }

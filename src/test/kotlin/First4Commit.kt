@@ -16,10 +16,10 @@ object First4Commit : StringSpec({
     val resources = Path("src/test/resources")
 
     "markdown" {
-        builder.render(templates["markdown"]!!) shouldBe (resources / "first4.md").readText()
+        builder.render(markdown) shouldBe (resources / "first4.md").readText()
     }
 
     "bbcode" {
-        builder.render(templates["bbcode"]!!) shouldBe (resources / "first4.bbcode").readText()
+        builder.render(bbcode) shouldBe (resources / "first4.bbcode").readText()
     }
 })

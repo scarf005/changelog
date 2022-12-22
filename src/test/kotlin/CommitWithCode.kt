@@ -16,6 +16,6 @@ object CommitWithCode : StringSpec({
     val resources = Path("src/test/resources") / "withCode.bbcode"
 
     "ec0b149" {
-        ChangelogGenerator(listOf(commit!!)).render(templates["bbcode"]!!) shouldBe resources.readText()
+        ChangelogGenerator(listOf(commit!!)).render(bbcode) shouldBe resources.readText()
     }
 })

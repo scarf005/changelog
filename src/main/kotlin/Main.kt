@@ -1,5 +1,5 @@
 import changelog.ChangelogGenerator
-import changelog.Template
+import changelog.Config
 import com.charleskorn.kaml.Yaml
 import com.github.syari.kgit.KGit
 import kotlinx.serialization.decodeFromString
@@ -7,6 +7,7 @@ import mu.KotlinLogging
 import org.eclipse.jgit.revwalk.RevCommit
 import version.SemVer
 import version.VersionCriteria
+import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.div
 import kotlin.io.path.readText
@@ -31,11 +32,11 @@ fun List<ConventionalCommit>.version(criteria: VersionCriteria) = asReversed()
         acc + version
     }
 
-val templates =
-    listOf(
-        "markdown",
-        "bbcode"
-    ).associateWith { Yaml.default.decodeFromString<Template>(Path("src/main/resources/$it.yaml").readText()) }
+fun Path.toConfig() = Yaml.default.decodeFromString<Config>(readText())
+
+val resources = Path("src/main/resources")
+val markdown = (resources / "markdown.yaml").toConfig()
+val bbcode = (resources / "bbcode.yaml").toConfig()
 
 fun List<ConventionalCommit>.toSections(sections: ChangelogSections) =
     groupBy { it.parseType(sections) }
@@ -50,8 +51,7 @@ fun main() {
         val commits = log { addRange(begin, HEAD()) }
             .mapNotNull { ConventionalCommit.of(it) }
 
-
-        ChangelogGenerator(commits).render(templates["bbcode"]!!).also(::println)
+        ChangelogGenerator(commits).render(bbcode).also(::println)
 
 //        tag {
 //            name = changelog.tag

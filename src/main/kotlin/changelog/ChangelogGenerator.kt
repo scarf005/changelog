@@ -19,19 +19,19 @@ class ChangelogGenerator(
     private val sectionCriteria: ChangelogSections = ChangelogSections(),
     private val versionCriteria: VersionCriteria = VersionCriteria(),
 ) {
-    fun render(template: Template): String {
+    fun render(config: Config): String {
         fun String.applyKeys() =
-            template.keys?.mapKeys { "{${it.key}}" }?.template(this) ?: this
+            config.postprocessor.keys.mapKeys { "{${it.key}}" }.template(this)
 
         fun String.applyRegex() =
-            template.replace?.mapKeys { it.key.toRegex() }?.templateRegex(this) ?: this
+            config.postprocessor.replace.mapKeys { it.key.toRegex() }.templateRegex(this)
 
-        fun renderItem(message: String) = template.items.replace("{desc}", message)
+        fun renderItem(message: String) = config.template.items.replace("{desc}", message)
         fun renderSection(type: SectionType, commits: List<ConventionalCommit>) =
             mapOf(
                 "{desc}" to type.desc,
                 "{items}" to commits.joinToString("\n") { renderItem(it.desc) }
-            ).template(template.section)
+            ).template(config.template.section)
 
 
         val date = commits.first().commit.date()
@@ -45,7 +45,7 @@ class ChangelogGenerator(
                     "{sections}" to it.joinToString("\n").trimEnd(),
                     "{tag}" to "v$version",
                     "{date}" to date,
-                ).template(template.changelog)
+                ).template(config.template.changelog)
             }
             .applyRegex()
             .applyKeys()

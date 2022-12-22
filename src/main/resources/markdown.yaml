@@ -1,11 +1,12 @@
-changelog: |
-  # {tag} ({date})
-  
-  {sections}
+template:
+  changelog: |
+    # {tag} ({date})
+    
+    {sections}
 
-section: |
-  ## {desc}
-  
-  {items}
+  section: |
+    ## {desc}
+    
+    {items}
 
-items: "- {desc}"
+  items: "- {desc}"

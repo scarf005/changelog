@@ -1,4 +1,13 @@
+package changelog
+
+import ChangelogSections
+import ConventionalCommit
+import SectionType
+import VersionCriteria
+import date
 import kotlinx.serialization.Serializable
+import toSections
+import version
 import java.util.*
 
 /**
@@ -13,28 +22,8 @@ data class Template(
     val keys: Map<String, String>? = null,
 ) {
     init {
-        checkReservedKeys()
-        allKeys("tag", "date", "sections").shouldContain(changelog)
-        allKeys("desc", "items").shouldContain(section)
-        allKeys("desc").shouldContain(items)
+        this.validate()
     }
-
-    private fun checkReservedKeys() {
-        val reservedKeys = setOf("tag", "date", "desc", "sections")
-        val keys = (keys?.keys ?: emptySet()).toSet()
-        val diff = reservedKeys.intersect(keys)
-        require(diff.isEmpty()) { "The following keys are reserved $reservedKeys but got $diff" }
-    }
-
-    private fun Set<String>.shouldContain(text: String) {
-        val keys = text.keys()
-        require(this.containsAll(keys)) { "keys must be a subset of $this, but ${keys - this} is not" }
-    }
-
-
-    private fun allKeys(vararg strings: String) = strings.toSet() + (keys?.keys ?: emptySet())
-    private fun String.keys() =
-        Regex("""\{(\w+)}""").findAll(this).map { it.groupValues[1] }.toSet()
 
     private fun String.applyKeys() = keys?.let { keys ->
         keys.entries.fold(this) { acc, (k, v) ->
@@ -50,7 +39,7 @@ data class Template(
     } ?: this
 
     private fun ConventionalCommit.renderItem() = items.replace("{desc}", desc)
-    private fun SortedMap<ChangelogSectionType, List<ConventionalCommit>>.renderSections() =
+    private fun SortedMap<SectionType, List<ConventionalCommit>>.renderSections() =
         map { (key, commits) ->
             val list = commits.joinToString("\n") { it.renderItem() }
             section
@@ -82,9 +71,33 @@ data class Template(
     companion object {
         fun builder(
             commits: List<ConventionalCommit>,
-            section: ChangelogSections,
-            criteria: VersionCriteria,
+            section: ChangelogSections = ChangelogSections(),
+            criteria: VersionCriteria = VersionCriteria(),
         ): (Template) -> String =
             { template: Template -> template.toChangelog(commits, section, criteria) }
     }
+}
+
+fun Template.validate() {
+    fun keys(s: String) =
+        Regex("""\{(\w+)}""").findAll(s).map { it.groupValues[1] }.toSet()
+
+    fun checkReservedKeys() {
+        val reservedKeys = setOf("tag", "date", "desc", "sections")
+        val keys = (keys?.keys ?: emptySet()).toSet()
+        val diff = reservedKeys.intersect(keys)
+        require(diff.isEmpty()) { "The following keys are reserved $reservedKeys but got $diff" }
+    }
+
+    fun Set<String>.shouldContain(text: String) {
+        val keys = keys(text)
+        require(this.containsAll(keys)) { "keys must be a subset of $this, but ${keys - this} is not" }
+    }
+
+    fun allKeys(vararg strings: String) = strings.toSet() + (keys?.keys ?: emptySet())
+
+    checkReservedKeys()
+    allKeys("tag", "date", "sections").shouldContain(changelog)
+    allKeys("desc", "items").shouldContain(section)
+    allKeys("desc").shouldContain(items)
 }

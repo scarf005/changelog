@@ -1,3 +1,4 @@
+import changelog.Template
 import com.charleskorn.kaml.Yaml
 import com.github.syari.kgit.KGit
 import kotlinx.serialization.decodeFromString
@@ -41,20 +42,13 @@ fun List<ConventionalCommit>.toSections(sections: ChangelogSections) =
         })
 
 fun main() {
-    val defaultSections = ChangelogSections(
-        ChangelogSectionType("New Features", listOf("feat")),
-        ChangelogSectionType("Fixes", listOf("fix")),
-    )
-
     KGit.open(cwd.toFile()).run {
         val begin = prevId(findId("v0.0.0"))
         val commits = log { addRange(begin, HEAD()) }
             .mapNotNull { ConventionalCommit.of(it) }
 
-        val criteria = VersionCriteria()
 
-        Template.builder(commits, defaultSections, criteria)(templates["bbcode"]!!).also(::println)
-
+        Template.builder(commits)(templates["bbcode"]!!).also(::println)
 
 //        tag {
 //            name = changelog.tag

@@ -3,10 +3,10 @@ package changelog
 import ChangelogSections
 import ConventionalCommit
 import SectionType
-import VersionCriteria
 import date
 import toSections
 import version
+import version.VersionCriteria
 
 fun Map<String, String>.template(text: String) =
     entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }

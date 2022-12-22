@@ -5,6 +5,8 @@ import com.github.syari.kgit.KGit
 import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import org.eclipse.jgit.revwalk.RevCommit
+import version.SemVer
+import version.VersionCriteria
 import kotlin.io.path.Path
 import kotlin.io.path.div
 import kotlin.io.path.readText

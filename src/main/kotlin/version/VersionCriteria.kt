@@ -1,3 +1,5 @@
+package version
+
 import kotlinx.serialization.Serializable
 
 @Serializable

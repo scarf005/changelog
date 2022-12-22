@@ -1,4 +1,6 @@
 import org.eclipse.jgit.revwalk.RevCommit
+import version.Version
+import version.VersionCriteria
 
 class ConventionalCommit(val commit: RevCommit) {
     private val groups = regex.matchEntire(commit.shortMessage)!!.groups

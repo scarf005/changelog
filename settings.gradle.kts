@@ -1,1 +1,1 @@
-rootProject.name = "vergen"
+rootProject.name = "changelog"

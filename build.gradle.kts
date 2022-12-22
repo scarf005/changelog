@@ -14,8 +14,12 @@ repositories {
 
 dependencies {
     implementation("com.github.sya-ri:kgit:1.0.5")
+
     implementation("org.slf4j:slf4j-api:2.0.6")
     implementation("org.slf4j:slf4j-simple:2.0.6")
+//    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
+
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
 
     testImplementation(kotlin("test"))
 

@@ -1,4 +1,4 @@
-import changelog.Template
+import changelog.ChangelogGenerator
 import com.github.syari.kgit.KGit
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -12,14 +12,14 @@ object First4Commit : StringSpec({
         log { add(findId("98ce0b3")) }
     }.mapNotNull { ConventionalCommit.of(it) }
 
-    val builder = Template.builder(commits)
+    val builder = ChangelogGenerator(commits)
     val resources = Path("src/test/resources")
 
     "markdown" {
-        builder(templates["markdown"]!!) shouldBe (resources / "first4.md").readText()
+        builder.render(templates["markdown"]!!) shouldBe (resources / "first4.md").readText()
     }
 
     "bbcode" {
-        builder(templates["bbcode"]!!) shouldBe (resources / "first4.bbcode").readText()
+        builder.render(templates["bbcode"]!!) shouldBe (resources / "first4.bbcode").readText()
     }
 })

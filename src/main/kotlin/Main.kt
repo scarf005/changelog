@@ -1,3 +1,4 @@
+import changelog.ChangelogGenerator
 import changelog.Template
 import com.charleskorn.kaml.Yaml
 import com.github.syari.kgit.KGit
@@ -48,7 +49,7 @@ fun main() {
             .mapNotNull { ConventionalCommit.of(it) }
 
 
-        Template.builder(commits)(templates["bbcode"]!!).also(::println)
+        ChangelogGenerator(commits).render(templates["bbcode"]!!).also(::println)
 
 //        tag {
 //            name = changelog.tag

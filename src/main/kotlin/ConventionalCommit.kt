@@ -15,7 +15,7 @@ class ConventionalCommit(val commit: RevCommit) {
     fun parseVersion(criteria: VersionCriteria): Version? =
         if (breaking) Version.MAJOR else criteria.version(type)
 
-    fun parseType(criteria: ChangelogSections): ChangelogSectionType? =
+    fun parseType(criteria: ChangelogSections): SectionType? =
         if (breaking) criteria.breaking else criteria.sections.find { it.types.contains(type) }
 
     companion object {

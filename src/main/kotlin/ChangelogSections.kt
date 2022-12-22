@@ -1,8 +1,13 @@
-data class ChangelogSectionType(val desc: String, val types: List<String>)
+import kotlinx.serialization.Serializable
 
-class ChangelogSections(
-    vararg val sections: ChangelogSectionType,
-    breakingText: String = "Breaking Changes"
-) {
-    val breaking = ChangelogSectionType(breakingText, emptyList())
-}
+@Serializable
+data class SectionType(val desc: String, val types: List<String>)
+
+@Serializable
+data class ChangelogSections(
+    val breaking: SectionType = SectionType("Breaking Changes", emptyList()),
+    val sections: List<SectionType> = listOf(
+        SectionType("New Features", listOf("feat")),
+        SectionType("Fixes", listOf("fix")),
+    )
+)

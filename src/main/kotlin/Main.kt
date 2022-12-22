@@ -1,3 +1,4 @@
+import changelog.Template
 import com.charleskorn.kaml.Yaml
 import com.github.syari.kgit.KGit
 import kotlinx.serialization.decodeFromString
@@ -27,8 +28,11 @@ fun List<ConventionalCommit>.version(criteria: VersionCriteria) = asReversed()
         acc + version
     }
 
-val markdownTemplate =
-    Yaml.default.decodeFromString<Template>(Path("src/main/resources/markdown.yaml").readText())
+val templates =
+    listOf(
+        "markdown",
+        "bbcode"
+    ).associateWith { Yaml.default.decodeFromString<Template>(Path("src/main/resources/$it.yaml").readText()) }
 
 fun List<ConventionalCommit>.toSections(sections: ChangelogSections) =
     groupBy { it.parseType(sections) }
@@ -38,20 +42,13 @@ fun List<ConventionalCommit>.toSections(sections: ChangelogSections) =
         })
 
 fun main() {
-    val defaultSections = ChangelogSections(
-        ChangelogSectionType("New Features", listOf("feat")),
-        ChangelogSectionType("Fixes", listOf("fix")),
-    )
-
     KGit.open(cwd.toFile()).run {
         val begin = prevId(findId("v0.0.0"))
         val commits = log { addRange(begin, HEAD()) }
             .mapNotNull { ConventionalCommit.of(it) }
 
-        val criteria = VersionCriteria()
 
-        Template.of(commits, defaultSections, criteria)(markdownTemplate).also(::println)
-
+        Template.builder(commits)(templates["bbcode"]!!).also(::println)
 
 //        tag {
 //            name = changelog.tag

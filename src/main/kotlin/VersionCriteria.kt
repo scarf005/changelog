@@ -1,3 +1,6 @@
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class VersionCriteria(
     val majors: List<String> = emptyList(),
     val minors: List<String> = listOf("feat"),

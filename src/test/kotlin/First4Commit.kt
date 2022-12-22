@@ -1,21 +1,25 @@
-import changelog.Changelog
-import changelog.toBBCode
-import changelog.toMarkdown
+import changelog.Template
+import com.github.syari.kgit.KGit
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.div
 import kotlin.io.path.readText
 
 object First4Commit : StringSpec({
-    val changelog = Changelog(begin = "cac70d4", end = "98ce0b3")
+    val commits = KGit.open(File(".")).run {
+        log { add(findId("98ce0b3")) }
+    }.mapNotNull { ConventionalCommit.of(it) }
+
+    val builder = Template.builder(commits)
     val resources = Path("src/test/resources")
 
     "markdown" {
-        changelog.toMarkdown() shouldBe (resources / "first4.md").readText()
+        builder(templates["markdown"]!!) shouldBe (resources / "first4.md").readText()
     }
 
     "bbcode" {
-        changelog.toBBCode() shouldBe (resources / "first4.bbcode").readText()
+        builder(templates["bbcode"]!!) shouldBe (resources / "first4.bbcode").readText()
     }
 })

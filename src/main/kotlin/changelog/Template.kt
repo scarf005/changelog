@@ -2,12 +2,6 @@ package changelog
 
 import kotlinx.serialization.Serializable
 
-fun Map<String, String>.template(text: String) =
-    entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }
-
-fun Map<Regex, String>.templateRegex(text: String) =
-    entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }
-
 
 /**
  * @property keys the keys to use for the changelog sections

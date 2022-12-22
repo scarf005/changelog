@@ -8,6 +8,12 @@ import date
 import toSections
 import version
 
+fun Map<String, String>.template(text: String) =
+    entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }
+
+fun Map<Regex, String>.templateRegex(text: String) =
+    entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }
+
 class ChangelogGenerator(
     private val commits: List<ConventionalCommit>,
     private val sectionCriteria: ChangelogSections = ChangelogSections(),

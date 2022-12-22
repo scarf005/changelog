@@ -1,4 +1,5 @@
 import changelog.ChangelogGenerator
+import changelog.ChangelogGroup
 import com.github.syari.kgit.KGit
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -16,6 +17,6 @@ object CommitWithCode : StringSpec({
     val resources = Path("src/test/resources") / "withCode.bbcode"
 
     "ec0b149" {
-        ChangelogGenerator(listOf(commit!!)).render(templates["bbcode"]!!) shouldBe resources.readText()
+        ChangelogGenerator(ChangelogGroup(listOf(commit!!))).render(bbcode) shouldBe resources.readText()
     }
 })

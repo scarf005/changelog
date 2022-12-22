@@ -1,4 +1,5 @@
-enum class Version { MAJOR, MINOR, PATCH }
+package version
+
 data class SemVer(val major: Int = 0, val minor: Int = 0, val patch: Int = 0) {
     override fun toString(): String = "$major.$minor.$patch"
     operator fun plus(other: Version?) = when (other) {

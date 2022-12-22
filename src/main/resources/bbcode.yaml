@@ -1,20 +1,22 @@
-changelog: |
-  [h1]{tag} ({date})[/h1]
-  
-  {sections}
+template:
+  changelog: |
+    [h1]{tag} ({date})[/h1]
+    
+    {sections}
 
-section: |
-  [h2]{desc}[/h2]
-  [list]
-  {items}
-  [/list]
+  section: |
+    [h2]{desc}[/h2]
+    [list]
+    {items}
+    [/list]
 
-items: "    [*] {desc}"
+  items: "    [*] {desc}"
 
-replace:
-  "`([^`]+)`": "[i]$1[/i]"
-  "#(\\d+)": "[url=https://github.com/{user}/{repo}/pull/$1]$0[/url]"
+postprocessor:
+  replace:
+    "`([^`]+)`": "[i]$1[/i]"
+    "#(\\d+)": "[url=https://github.com/{user}/{repo}/pull/$1]$0[/url]"
 
-keys:
-  user: scarf005
-  repo: marisa
+  keys:
+    user: scarf005
+    repo: marisa

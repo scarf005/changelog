@@ -1,4 +1,5 @@
 import changelog.ChangelogGenerator
+import changelog.ChangelogGroup
 import com.charleskorn.kaml.Yaml
 import com.github.syari.kgit.KGit
 import config.Config
@@ -51,7 +52,7 @@ fun main() {
         val commits = log { addRange(begin, HEAD()) }
             .mapNotNull { ConventionalCommit.of(it) }
 
-        ChangelogGenerator(commits).render(bbcode).also(::println)
+        ChangelogGenerator(ChangelogGroup(commits)).render(bbcode).also(::println)
 
 //        tag {
 //            name = changelog.tag

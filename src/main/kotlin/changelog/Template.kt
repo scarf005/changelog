@@ -60,8 +60,8 @@ data class Template(
             .renderSections()
             .let {
                 changelog
-                    .replace("{sections}", it.joinToString("\n"))
-                    .replace("{tag}", version.toString())
+                    .replace("{sections}", it.joinToString("\n").trimEnd())
+                    .replace("{tag}", "v$version")
                     .replace("{date}", date)
             }
             .applyRegex()

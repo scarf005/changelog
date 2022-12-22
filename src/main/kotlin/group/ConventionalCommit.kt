@@ -1,3 +1,6 @@
+package group
+
+import isConventional
 import org.eclipse.jgit.revwalk.RevCommit
 import version.Version
 import version.VersionCriteria
@@ -17,7 +20,7 @@ class ConventionalCommit(val commit: RevCommit) {
     fun parseVersion(criteria: VersionCriteria): Version? =
         if (breaking) Version.MAJOR else criteria.version(type)
 
-    fun parseType(criteria: ChangelogSections): SectionType? =
+    fun parseType(criteria: CommitSections): CommitSection? =
         if (breaking) criteria.breaking else criteria.sections.find { it.types.contains(type) }
 
     companion object {

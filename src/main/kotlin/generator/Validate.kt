@@ -1,4 +1,4 @@
-package changelog
+package generator
 
 import config.PostProcess
 import config.Template

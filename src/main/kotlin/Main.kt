@@ -1,8 +1,9 @@
-import changelog.ChangelogGenerator
-import changelog.ChangelogGroup
 import com.charleskorn.kaml.Yaml
 import com.github.syari.kgit.KGit
 import config.Config
+import generator.ChangelogGenerator
+import group.CommitGroup
+import group.ConventionalCommit
 import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import org.eclipse.jgit.revwalk.RevCommit
@@ -16,7 +17,7 @@ import kotlin.io.path.readText
 private val logger = KotlinLogging.logger {}
 
 val cwd = Path("/home/scarf/repo/Marisa")
-val changelogPath = cwd / "docs" / "changelog"
+val changelogPath = cwd / "docs" / "generator"
 val changelogFile = changelogPath / "changelog.md"
 val bbcodeFile = changelogPath / "changelog.bbcode"
 val versionFile = changelogPath / "version.txt"
@@ -39,20 +40,13 @@ val resources = Path("src/main/resources")
 val markdown = (resources / "markdown.yaml").toConfig()
 val bbcode = (resources / "bbcode.yaml").toConfig()
 
-fun List<ConventionalCommit>.toSections(sections: ChangelogSections) =
-    groupBy { it.parseType(sections) }
-        .filterNotNull()
-        .toSortedMap(compareBy {
-            if (it === sections.breaking) -1 else sections.sections.indexOf(it)
-        })
-
 fun main() {
     KGit.open(cwd.toFile()).run {
         val begin = prevId(findId("v0.0.0"))
         val commits = log { addRange(begin, HEAD()) }
             .mapNotNull { ConventionalCommit.of(it) }
 
-        ChangelogGenerator(ChangelogGroup(commits)).render(bbcode).also(::println)
+        ChangelogGenerator(CommitGroup(commits)).render(bbcode).also(::println)
 
 //        tag {
 //            name = changelog.tag

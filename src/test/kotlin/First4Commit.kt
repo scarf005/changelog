@@ -1,6 +1,7 @@
-import changelog.ChangelogGenerator
-import changelog.ChangelogGroup
 import com.github.syari.kgit.KGit
+import generator.ChangelogGenerator
+import group.CommitGroup
+import group.ConventionalCommit
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
@@ -13,7 +14,7 @@ object First4Commit : StringSpec({
         log { add(findId("98ce0b3")) }
     }.mapNotNull { ConventionalCommit.of(it) }
 
-    val builder = ChangelogGenerator(ChangelogGroup(commits))
+    val builder = ChangelogGenerator(CommitGroup(commits))
     val resources = Path("src/test/resources")
 
     "markdown" {

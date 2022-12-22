@@ -10,6 +10,13 @@ import toSections
 import version
 import java.util.*
 
+fun Map<String, String>.template(text: String) =
+    entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }
+
+fun Map<Regex, String>.templateRegex(text: String) =
+    entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }
+
+
 /**
  * @property keys the keys to use for the changelog sections
  */
@@ -25,29 +32,22 @@ data class Template(
         this.validate()
     }
 
-    private fun String.applyKeys() = keys?.let { keys ->
-        keys.entries.fold(this) { acc, (k, v) ->
-            acc.replace("{$k}", v)
-        }
-    } ?: this
+    private fun String.applyKeys() = keys?.mapKeys { "{${it.key}}" }?.template(this) ?: this
+
 
     /** find regex [keys] then replace with [replace] */
-    private fun String.applyRegex() = replace?.let { replace ->
-        replace.entries.fold(this) { acc, (k, v) ->
-            acc.replace(k.toRegex(), v)
-        }
-    } ?: this
+    private fun String.applyRegex() =
+        replace?.mapKeys { it.key.toRegex() }?.templateRegex(this) ?: this
 
     private fun ConventionalCommit.renderItem() = items.replace("{desc}", desc)
     private fun SortedMap<SectionType, List<ConventionalCommit>>.renderSections() =
         map { (key, commits) ->
             val list = commits.joinToString("\n") { it.renderItem() }
-            section
-                .replace("{desc}", key.desc)
-                .replace("{items}", list)
+
+            mapOf("{desc}" to key.desc, "{items}" to list).template(section)
         }
 
-    private fun toChangelog(
+    fun toChangelog(
         commits: List<ConventionalCommit>,
         changelogSections: ChangelogSections,
         criteria: VersionCriteria
@@ -59,10 +59,11 @@ data class Template(
             .toSections(changelogSections)
             .renderSections()
             .let {
-                changelog
-                    .replace("{sections}", it.joinToString("\n").trimEnd())
-                    .replace("{tag}", "v$version")
-                    .replace("{date}", date)
+                mapOf(
+                    "{sections}" to it.joinToString("\n").trimEnd(),
+                    "{tag}" to "v$version",
+                    "{date}" to date,
+                ).template(changelog)
             }
             .applyRegex()
             .applyKeys()
@@ -76,28 +77,4 @@ data class Template(
         ): (Template) -> String =
             { template: Template -> template.toChangelog(commits, section, criteria) }
     }
-}
-
-fun Template.validate() {
-    fun keys(s: String) =
-        Regex("""\{(\w+)}""").findAll(s).map { it.groupValues[1] }.toSet()
-
-    fun checkReservedKeys() {
-        val reservedKeys = setOf("tag", "date", "desc", "sections")
-        val keys = (keys?.keys ?: emptySet()).toSet()
-        val diff = reservedKeys.intersect(keys)
-        require(diff.isEmpty()) { "The following keys are reserved $reservedKeys but got $diff" }
-    }
-
-    fun Set<String>.shouldContain(text: String) {
-        val keys = keys(text)
-        require(this.containsAll(keys)) { "keys must be a subset of $this, but ${keys - this} is not" }
-    }
-
-    fun allKeys(vararg strings: String) = strings.toSet() + (keys?.keys ?: emptySet())
-
-    checkReservedKeys()
-    allKeys("tag", "date", "sections").shouldContain(changelog)
-    allKeys("desc", "items").shouldContain(section)
-    allKeys("desc").shouldContain(items)
 }

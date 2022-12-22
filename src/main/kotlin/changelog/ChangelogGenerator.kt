@@ -34,8 +34,12 @@ class ChangelogGenerator(
     }
 
     fun render(config: Config): String {
-        val postProcessor = PostProcessor(config.postProcess)
-        val text = applyTemplate(config.template)
-        return postProcessor.process(text)
+        val template = config.template
+        val postProcess = config.postProcess
+
+        TemplateValidator(template, postProcess).validate()
+
+        val text = applyTemplate(template)
+        return PostProcessor(postProcess).process(text)
     }
 }

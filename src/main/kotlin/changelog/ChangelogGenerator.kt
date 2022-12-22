@@ -19,35 +19,43 @@ class ChangelogGenerator(
     private val sectionCriteria: ChangelogSections = ChangelogSections(),
     private val versionCriteria: VersionCriteria = VersionCriteria(),
 ) {
-    fun render(config: Config): String {
+    private fun postprocess(postprocessor: PostProcess, text: String): String {
         fun String.applyKeys() =
-            config.postprocessor.keys.mapKeys { "{${it.key}}" }.template(this)
+            postprocessor.keys.mapKeys { "{${it.key}}" }.template(this)
 
         fun String.applyRegex() =
-            config.postprocessor.replace.mapKeys { it.key.toRegex() }.templateRegex(this)
+            postprocessor.replace.mapKeys { it.key.toRegex() }.templateRegex(this)
 
-        fun renderItem(message: String) = config.template.items.replace("{desc}", message)
-        fun renderSection(type: SectionType, commits: List<ConventionalCommit>) =
-            mapOf(
-                "{desc}" to type.desc,
-                "{items}" to commits.joinToString("\n") { renderItem(it.desc) }
-            ).template(config.template.section)
+        return text.applyRegex().applyKeys()
+    }
 
-
+    private fun applyTemplate(
+        template: Template,
+        commits: List<ConventionalCommit>
+    ): String {
         val date = commits.first().commit.date()
         val version = commits.version(versionCriteria)
 
+        fun renderItem(message: String) = template.items.replace("{desc}", message)
+
+        fun renderSection(type: SectionType, list: List<ConventionalCommit>) =
+            mapOf(
+                "{desc}" to type.desc,
+                "{items}" to list.joinToString("\n") { renderItem(it.desc) }
+            ).template(template.section)
+
         return commits
             .toSections(sectionCriteria)
-            .map { (type, commits) -> renderSection(type, commits) }
+            .map { (type, list) -> renderSection(type, list) }
             .let {
                 mapOf(
                     "{sections}" to it.joinToString("\n").trimEnd(),
                     "{tag}" to "v$version",
                     "{date}" to date,
-                ).template(config.template.changelog)
+                ).template(template.changelog)
             }
-            .applyRegex()
-            .applyKeys()
     }
+
+    fun render(config: Config): String =
+        postprocess(config.postProcess, applyTemplate(config.template, commits))
 }

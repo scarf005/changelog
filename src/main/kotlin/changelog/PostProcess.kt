@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  * @property keys additional keys to used as template variable
  */
 @Serializable
-data class PostProcessor(
+data class PostProcess(
     val replace: Map<String, String> = emptyMap(),
     val keys: Map<String, String> = emptyMap(),
 )

@@ -1,6 +1,6 @@
 package changelog
 
-class TemplateValidator(val template: Template, val postProcess: PostProcessor) {
+class TemplateValidator(val template: Template, val postProcess: PostProcess) {
     fun keys(s: String) =
         Regex("""\{(\w+)}""").findAll(s).map { it.groupValues[1] }.toSet()
 

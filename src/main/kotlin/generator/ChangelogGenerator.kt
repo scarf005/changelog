@@ -9,9 +9,7 @@ import group.ConventionalCommit
 fun Map<String, String>.template(text: String) =
     entries.fold(text) { acc, (k, v) -> acc.replace(k, v) }
 
-class ChangelogGenerator(
-    private val commitGroup: CommitGroup
-) {
+class ChangelogGenerator(private val commitGroup: CommitGroup) {
     private fun applyTemplate(
         template: Template,
     ): String {

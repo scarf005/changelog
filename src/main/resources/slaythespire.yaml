@@ -3,6 +3,8 @@ template:
     What's new in {tag} ({date})
     
     {sections}
+    
+    please visit https://github.com/scarf005/Marisa/releases/latest for more info
 
   section: |
     * {desc}
@@ -10,3 +12,8 @@ template:
     {items}
 
   items: "- {desc}"
+
+postprocessor:
+  replace:
+    "`([^`]+)`": "[$1]"
+    "\\(#\\d+\\)": ""

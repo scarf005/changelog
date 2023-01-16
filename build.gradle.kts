@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.7.20"
     kotlin("plugin.serialization") version "1.7.20"
     application
+    `maven-publish`
 }
 
 group = "org.scarf"
@@ -40,4 +41,16 @@ tasks.withType<KotlinCompile> {
 
 application {
     mainClass.set("MainKt")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "io.github.scarf005"
+            artifactId = "changelog"
+            version = "0.0-SNAPSHOT"
+            
+            from(components["kotlin"])
+        }
+    }
 }

@@ -8,10 +8,14 @@ fun Set<String>.shouldContain(keys: Set<String>) {
 }
 
 class TemplateValidator(private val template: Template, private val postProcess: PostProcess) {
+    private val changelogKeys = setOf("tag", "date", "sections")
+    private val sectionKeys = setOf("desc", "items")
+    private val itemsKeys = setOf("desc")
+    private val allKeys = changelogKeys + sectionKeys + itemsKeys
     fun keys(s: String) =
         Regex("""\{(\w+)}""").findAll(s).map { it.groupValues[1] }.toSet()
 
-    fun checkReservedKeys() {
+    private fun checkReservedKeys() {
         val reservedKeys = setOf("tag", "date", "desc", "sections")
         val keys = postProcess.additionalKeys.keys.toSet()
         val diff = reservedKeys.intersect(keys)

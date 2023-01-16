@@ -9,5 +9,5 @@ class PostProcessor(private val postProcess: PostProcess) {
     private fun String.applyRegex() =
         postProcess.regexKeys.mapKeys { it.key.toRegex() }.templateRegex(this)
 
-    fun process(text: String) = text.applyKeys().applyRegex()
+    fun process(text: String) = text.applyRegex().applyKeys()
 }

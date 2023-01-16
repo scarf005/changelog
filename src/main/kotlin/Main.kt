@@ -37,8 +37,8 @@ val manual = Path("/home/scarf/repo/Marisa/docs/changelog")
 
 fun main() {
     KGit.open(cwd.toFile()).run {
-        val lastTag = tagList().last()
-        val commits = log { addRange(lastTag.objectId, HEAD()) }
+        val lastTag = tagList().maxBy { it.toSemVer() }
+        val commits = log { addRange(peel(lastTag), HEAD()) }
             .mapNotNull { ConventionalCommit.of(it) }
 
         val group = CommitGroup(lastTag.toSemVer(), commits)
@@ -51,11 +51,16 @@ fun main() {
             .forEach { (text, file) -> file.writeText(text) }
 
         (manual / "version.txt").writeText(group.version.toString())
-//        if (lastTag.toSemVer() == group.version) return
-//
-//        tag {
-//            name = group.version.tag
-//            message = changelog.render(markdown)
-//        }
+
+        if (lastTag.toSemVer() == group.version) return
+
+        print("newer version [${group.version}]. (previously [${lastTag.toSemVer()}]) create tag? [y/N] ")
+        if (readln() != "y") {
+            return
+        }
+        tag {
+            name = group.version.tag
+            message = changelog.render(markdown)
+        }
     }
 }

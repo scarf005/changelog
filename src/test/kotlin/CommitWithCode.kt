@@ -4,6 +4,7 @@ import group.CommitGroup
 import group.ConventionalCommit
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import version.SemVer
 import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.div
@@ -18,6 +19,6 @@ object CommitWithCode : StringSpec({
     val resources = Path("src/test/resources") / "withCode.bbcode"
 
     "ec0b149" {
-        ChangelogGenerator(CommitGroup(listOf(commit!!))).render(bbcode) shouldBe resources.readText()
+        ChangelogGenerator(CommitGroup(SemVer(), listOf(commit!!))).render(bbcode) shouldBe resources.readText()
     }
 })

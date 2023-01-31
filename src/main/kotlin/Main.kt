@@ -53,14 +53,8 @@ fun main() {
         (manual / "version.txt").writeText(group.version.toString())
 
         if (lastTag.toSemVer() == group.version) return
-
-        print("newer version [${group.version}]. (previously [${lastTag.toSemVer()}]) create tag? [y/N] ")
-        if (readln() != "y") {
-            return
-        }
         tag {
             name = group.version.tag
-            message = changelog.render(markdown)
         }
     }
 }

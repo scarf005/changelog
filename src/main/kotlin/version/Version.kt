@@ -1,3 +1,3 @@
 package version
 
-enum class Version { MAJOR, MINOR, PATCH }
+enum class Version { PATCH, MINOR, MAJOR }

@@ -4,6 +4,7 @@ import group.CommitGroup
 import group.ConventionalCommit
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import version.SemVer
 import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.div
@@ -14,7 +15,7 @@ object First4Commit : StringSpec({
         log { add(findId("98ce0b3")) }
     }.mapNotNull { ConventionalCommit.of(it) }
 
-    val builder = ChangelogGenerator(CommitGroup(commits))
+    val builder = ChangelogGenerator(CommitGroup(SemVer(), commits))
     val resources = Path("src/test/resources")
 
     "markdown" {
